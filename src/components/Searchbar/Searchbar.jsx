@@ -41,6 +41,5 @@ function Searchbar({ onSubmit }) {
     </header>
   );
 }
-
 Searchbar.propTypes = { onSubmit: PropTypes.func };
 export default Searchbar;
