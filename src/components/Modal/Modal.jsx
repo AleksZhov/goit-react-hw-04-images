@@ -10,9 +10,9 @@ function Modal({ url, alt, onClose }) {
   };
 
   useEffect(() => {
-    document.addEventListener('keydown', onEscClose);
+    window.addEventListener('keydown', onEscClose);
     return () => {
-      document.removeEventListener('keydown', onEscClose);
+      window.removeEventListener('keydown', onEscClose);
     };
   }, []);
 
