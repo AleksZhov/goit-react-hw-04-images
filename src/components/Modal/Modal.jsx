@@ -3,18 +3,17 @@ import PropTypes from 'prop-types';
 import s from './Modal.module.css';
 
 function Modal({ url, alt, onClose }) {
-  const onEscClose = evt => {
-    if (evt.key === 'Escape') {
-      onClose();
-    }
-  };
-
   useEffect(() => {
+    const onEscClose = evt => {
+      if (evt.key === 'Escape') {
+        onClose();
+      }
+    };
     window.addEventListener('keydown', onEscClose);
     return () => {
       window.removeEventListener('keydown', onEscClose);
     };
-  }, []);
+  }, [onClose]);
 
   return (
     <div

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Searchbar from './Searchbar/Searchbar';
 import ImageGallery from './ImageGallery/ImageGallery';
 import ButtonLoadMore from './ButtonLoadMore/ButtonLoadMore';
@@ -22,6 +22,7 @@ export function App() {
     }
     setSearchValue(value);
     setQueryPage(1);
+    newAPIRequest();
   };
 
   const newAPIRequest = () => {
@@ -41,6 +42,7 @@ export function App() {
 
   const pageIncrement = () => {
     setQueryPage(queryPage + 1);
+    newAPIRequest();
   };
 
   const openingModal = (largeUrl, alt) => {
@@ -53,10 +55,10 @@ export function App() {
     setIsModalOpen(false);
   };
 
-  useEffect(() => {
-    if (searchValue === '' && queryPage === 1) return;
-    newAPIRequest();
-  }, [searchValue, queryPage]);
+  // useEffect(() => {
+  //   if (searchValue === '' && queryPage === 1) return;
+  //   newAPIRequest();
+  // }, [searchValue, queryPage]);
 
   return (
     <div className="App">
