@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Searchbar from './Searchbar/Searchbar';
 import ImageGallery from './ImageGallery/ImageGallery';
 import ButtonLoadMore from './ButtonLoadMore/ButtonLoadMore';
@@ -15,19 +15,9 @@ export function App() {
   const [modalImgURL, setModalImgURL] = useState('');
   const [modalImgAlt, setModalImgAlt] = useState('');
 
-  const searchValueUpdate = value => {
-    if (value === searchValue) {
-      alert(`The ${value} was already requested. Please type another request`);
-      return;
-    }
-    setSearchValue(value);
-    setQueryPage(1);
-    newAPIRequest();
-  };
-
-  const newAPIRequest = () => {
+  const newAPIRequest = (value, page) => {
     setPending(true);
-    axiosRequest(searchValue, queryPage)
+    axiosRequest(value, page)
       .then(res => {
         setReturnedImgArray(
           queryPage === 1
@@ -40,9 +30,17 @@ export function App() {
       .catch(error => console.log(error));
   };
 
+  const searchValueUpdate = value => {
+    if (value === searchValue) {
+      alert(`The ${value} was already requested. Please type another request`);
+      return;
+    }
+    setSearchValue(value);
+    setQueryPage(1);
+  };
+
   const pageIncrement = () => {
-    setQueryPage(queryPage + 1);
-    newAPIRequest();
+    setQueryPage(prevState => prevState + 1);
   };
 
   const openingModal = (largeUrl, alt) => {
@@ -55,10 +53,10 @@ export function App() {
     setIsModalOpen(false);
   };
 
-  // useEffect(() => {
-  //   if (searchValue === '' && queryPage === 1) return;
-  //   newAPIRequest();
-  // }, [searchValue, queryPage]);
+  useEffect(() => {
+    if (searchValue === '' && queryPage === 1) return;
+    newAPIRequest(searchValue, queryPage);
+  }, [searchValue, queryPage]);
 
   return (
     <div className="App">
