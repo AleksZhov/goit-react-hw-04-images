@@ -1,36 +1,35 @@
-import React, { Component } from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import s from './Modal.module.css';
 
-class Modal extends Component {
-  onEscClose = evt => {
+function Modal({ url, alt, onClose }) {
+  const onEscClose = evt => {
     if (evt.key === 'Escape') {
-      this.props.onClose();
+      onClose();
     }
   };
 
-  componentDidMount() {
-    document.addEventListener('keydown', this.onEscClose);
-  }
-  componentWillUnmount() {
-    document.removeEventListener('keydown', this.onEscClose);
-  }
-  render() {
-    return (
-      <div
-        className={s.Overlay}
-        onClick={event => {
-          if (event.target === event.currentTarget) {
-            this.props.onClose();
-          }
-        }}
-      >
-        <div className={s.Modal}>
-          <img src={this.props.url} alt={this.props.alt} />
-        </div>
+  useEffect(() => {
+    document.addEventListener('keydown', onEscClose);
+    return () => {
+      document.removeEventListener('keydown', onEscClose);
+    };
+  }, []);
+
+  return (
+    <div
+      className={s.Overlay}
+      onClick={event => {
+        if (event.target === event.currentTarget) {
+          onClose();
+        }
+      }}
+    >
+      <div className={s.Modal}>
+        <img src={url} alt={alt} />
       </div>
-    );
-  }
+    </div>
+  );
 }
 
 Modal.propTypes = {

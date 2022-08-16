@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import Searchbar from './Searchbar/Searchbar';
 import ImageGallery from './ImageGallery/ImageGallery';
 import ButtonLoadMore from './ButtonLoadMore/ButtonLoadMore';
@@ -6,103 +6,79 @@ import axiosRequest from './axiosRequest';
 import { Audio } from 'react-loader-spinner';
 import Modal from './Modal/Modal';
 
-export class App extends Component {
-  state = {
-    searchValue: '',
-    err: '',
-    status: 'idle',
-    queryPage: 1,
-    returnedArray: [],
-    totalHits: 0,
-    pending: false,
-    isModalOpen: false,
-    modalImgURL: '',
-    modalImgAlt: '',
-  };
+export function App() {
+  const [searchValue, setSearchValue] = useState('');
+  const [queryPage, setQueryPage] = useState(1);
+  const [returnedImgArray, setReturnedImgArray] = useState([]);
+  const [pending, setPending] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalImgURL, setModalImgURL] = useState('');
+  const [modalImgAlt, setModalImgAlt] = useState('');
 
-  searchValueUpdate = value => {
-    if (value === this.state.searchValue) {
+  const searchValueUpdate = value => {
+    if (value === searchValue) {
       alert(`The ${value} was already requested. Please type another request`);
       return;
     }
-    this.setState({ searchValue: value, queryPage: 1, totalHits: 0 });
+    setSearchValue(value);
+    setQueryPage(1);
   };
 
-  searchValueReset() {
-    this.setState({ searchValue: '' });
-  }
-
-  newAPIRequest = () => {
-    this.setState({ pending: true });
-    axiosRequest(this.state.searchValue, this.state.queryPage)
+  const newAPIRequest = () => {
+    setPending(true);
+    axiosRequest(searchValue, queryPage)
       .then(res => {
-        this.setState({
-          returnedArray:
-            this.state.queryPage === 1
-              ? res.data.hits
-              : [...this.state.returnedArray, ...res.data.hits],
-          totalHits: res.data.totalHits,
-        });
-        this.setState({ pending: false });
+        setReturnedImgArray(
+          queryPage === 1
+            ? res.data.hits
+            : [...returnedImgArray, ...res.data.hits]
+        );
+
+        setPending(false);
       })
       .catch(error => console.log(error));
   };
 
-  pageIncrement = () => {
-    this.setState({ queryPage: this.state.queryPage + 1 });
+  const pageIncrement = () => {
+    setQueryPage(queryPage + 1);
   };
 
-  openingModal = (largeUrl, alt) => {
-    this.setState({
-      isModalOpen: true,
-      modalImgURL: largeUrl,
-      modalImgAlt: alt,
-    });
+  const openingModal = (largeUrl, alt) => {
+    setModalImgURL(largeUrl);
+    setModalImgAlt(alt);
+    setIsModalOpen(true);
   };
 
-  closingModal = () => {
-    this.setState({ isModalOpen: false });
+  const closingModal = () => {
+    setIsModalOpen(false);
   };
 
-  componentDidUpdate(prevProps, prevState) {
-    if (
-      prevState.searchValue !== this.state.searchValue ||
-      prevState.queryPage !== this.state.queryPage
-    ) {
-      this.newAPIRequest(this.state.searchValue);
-    }
-  }
+  useEffect(() => {
+    if (searchValue === '' && queryPage === 1) return;
+    newAPIRequest();
+  }, [searchValue, queryPage]);
 
-  render() {
-    return (
-      <div className="App">
-        <Searchbar onSubmit={this.searchValueUpdate} />
-        <ImageGallery
-          imageArr={this.state.returnedArray}
-          openModal={this.openingModal}
+  return (
+    <div className="App">
+      <Searchbar onSubmit={searchValueUpdate} />
+      <ImageGallery imageArr={returnedImgArray} openModal={openingModal} />
+      {pending && (
+        <Audio
+          height="80"
+          width="80"
+          radius="9"
+          color="green"
+          ariaLabel="three-dots-loading"
+          wrapperStyle
+          wrapperClass="spinner"
         />
-        {this.state.pending && (
-          <Audio
-            height="80"
-            width="80"
-            radius="9"
-            color="green"
-            ariaLabel="three-dots-loading"
-            wrapperStyle
-            wrapperClass="spinner"
-          />
-        )}
-        {this.state.totalHits > 12 && (
-          <ButtonLoadMore onClick={this.pageIncrement} />
-        )}
-        {this.state.isModalOpen && (
-          <Modal
-            url={this.state.modalImgURL}
-            alt={this.state.modalImgAlt}
-            onClose={this.closingModal}
-          />
-        )}
-      </div>
-    );
-  }
+      )}
+      {returnedImgArray.length % 12 === 0 && returnedImgArray.length !== 0 && (
+        <ButtonLoadMore onClick={pageIncrement} />
+      )}
+      {isModalOpen && (
+        <Modal url={modalImgURL} alt={modalImgAlt} onClose={closingModal} />
+      )}
+    </div>
+  );
 }
