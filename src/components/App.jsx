@@ -19,11 +19,7 @@ export function App() {
     setPending(true);
     axiosRequest(value, page)
       .then(res => {
-        setReturnedImgArray(
-          queryPage === 1
-            ? res.data.hits
-            : [...returnedImgArray, ...res.data.hits]
-        );
+        setReturnedImgArray(prevState => [...prevState, ...res.data.hits]);
 
         setPending(false);
       })
@@ -37,6 +33,7 @@ export function App() {
     }
     setSearchValue(value);
     setQueryPage(1);
+    setReturnedImgArray([]);
   };
 
   const pageIncrement = () => {
