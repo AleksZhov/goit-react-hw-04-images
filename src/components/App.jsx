@@ -27,10 +27,16 @@ export function App() {
   };
 
   const searchValueUpdate = value => {
+    if (value === '') {
+      alert('Please type something in search field');
+      return;
+    }
+
     if (value === searchValue) {
       alert(`The ${value} was already requested. Please type another request`);
       return;
     }
+
     setSearchValue(value);
     setQueryPage(1);
     setReturnedImgArray([]);
