@@ -19,7 +19,7 @@ export function App() {
     setPending(true);
     axiosRequest(value, page)
       .then(res => {
-        setReturnedImgArray(prevState => [...prevState, ...res.data.hits]);
+        setReturnedImgArray(() => [...returnedImgArray, ...res.data.hits]);
 
         setPending(false);
       })
